@@ -1,0 +1,17 @@
+{
+  "name": "av_sever",
+  "version": "1.0.0",
+  "description": "Communication between web browser running GUI.html and office vehicle.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "UTAS ENG232 2022 Group 2 ",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.18.1",
+    "serialport": "^10.4.0",
+    "usb-detection": "^4.14.1"
+  }
+}

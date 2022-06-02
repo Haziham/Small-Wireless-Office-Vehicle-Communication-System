@@ -1,0 +1,361 @@
+<!--This html file is the front end user Interface of the Robot Buggy project. The HTML page allows for input of high-level waypoint commands and intructions for the robot buggy.
+It passes the commands to the server that is hosting the GUI.HTML page on port 5000. It also recieves telemetry data from the server and displays any recieved data on the GUI.HTML page
+ for the user to view. 
+
+ This file is designed to work with server.js.
+
+    Last update: 1/6/2022
+    Authors: UTAS ENG232 2022 Group 2 
+    Version: 1.6 *FINAL*
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Buggy</title>
+  <style>
+    body {
+      min-width: 1300px;
+    }
+
+    h1 {
+      margin: 0%;
+      padding: 10px;
+      font-size: 50px;
+      background-color: #38A3A5;
+      font-family: 'Times New Roman';
+      color: rgb(0, 0, 0);
+      text-align: center;
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column-reverse;
+      clear: both;
+      width: 20%;
+      padding-left: 15px;
+      margin-left: 15px;
+      float: right;
+      font-style: italic;
+      font-size: large;
+      background-color: #7D8CC4;
+      height: 75vh;
+    }
+
+    .waypntbtn {
+      padding: 15px 15px;
+      border-radius: 8%;
+      font-size: 20px;
+      background-color: #eb8c3e;
+      cursor: pointer;
+    }
+
+    .waypntbtn:hover,
+    .waypntbtn:active {
+      background-color: #ffffff;
+      color: #eb8c3e;
+    }
+
+    .startBtn {
+      padding-inline: 30px;
+      padding-block: 20px;
+      border-radius: 8%;
+      background-color: #21bd02;
+      cursor: pointer;
+      font-size: 25px;
+      position: absolute;
+      top: 35%;
+      left: 25%;
+    }
+
+    .startBtn:hover,
+    .startBtn:active {
+      background-color: #ffffffd7;
+      color: #21bd02;
+    }
+
+    .pauseBtn {
+      padding: 20px;
+      border-radius: 8%;
+      background-color: #bdbd02;
+      cursor: pointer;
+      font-size: 25px;
+      position: absolute;
+      top: 35%;
+      left: 56%;
+    }
+
+    .pauseBtn:hover,
+    .pauseBtn:active {
+      background-color: #ffffffd7;
+      color: #bdbd02;
+    }
+
+    .eStopBtn {
+      padding: 5% 5%;
+      border-radius: 5%;
+      background-color: #ff0000;
+      cursor: pointer;
+      font-size: 25px;
+      color: rgb(0, 0, 0);
+      position: absolute;
+      top: 60%;
+      left: 25%;
+    }
+
+    .eStopBtn:hover,
+    .eStopBtn:active {
+      background-color: #ffffffd7;
+      background-position: 0 0;
+      color: #FF4742;
+    }
+
+    .outerContainer {
+      display: flex;
+      flex-direction: row;
+      background-color: #5d92ee;
+      border: solid;
+    }
+
+    .innerContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      padding: 5%;
+      row-gap: 15px;
+    }
+
+    .innerContainer2 {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      row-gap: 20px;
+      width: 100%;
+    }
+
+    input[type=number] {
+      padding: 10px;
+      border-radius: 1%;
+      margin-right: 10px;
+    }
+  </style>
+
+</head>
+
+<body style="background-color: #22577A; ">
+  <main>
+    <h1> Office Buggy</h1><!-- Main heading-->
+    <h2
+      style=" font-family: 'Trebuchet MS' ;  color: cornsilk; float: right; padding-right: 25px; font-size: 30px; border: solid; padding-left: 25px;">
+      Connection Status: <span id="conCheck"> </span> </h2>
+      <!-- Create HTML aisde element.-->
+    <aside style="border: solid; overflow-y: scroll; "> <!--Parent element of teleDisplay div-->
+      <div id='teleDisplay' class="left"> </div>
+    </aside>
+
+    <h2 style="color: cornsilk; font-size: 30px; text-align: center;  padding-top: 5%;">Enter Waypoint Information Below
+    </h2>
+
+    <div class="outerContainer"> <!--Parent element of innerContainers-->
+      <div class="innerContainer">
+        <!-- Create HTML input field elements-->
+        <label style="color:cornsilk; font-size: 20px;">Distance Forwards (Positive) or Backwards (Negative) In Metres</label>
+        <input type="number" id="command1" />
+        <label style="color:cornsilk; font-size: 20px;">Distance Left (Negative) or Right (Positive) In Metres </label>
+        <input type="number" id="command2" />
+        <label style="color:cornsilk; font-size: 20px;">Speed: Range of 0 (Slowest) to 1 (Fastest) </label>
+        <input type="number" id="command3" min="0" max="1" />
+        <button class='hover waypntbtn ' id='subButton' type='button'>Confirm Waypoint</button>
+      </div>
+
+      <div class="innerContainer2" style="position: relative;">
+        <p style="color: cornsilk; font-size: 25px;position: absolute; top: 2%; left: 18%;">Waypoint Confirmed:
+          <span id="com1"></span> <span id="com2"></span></p><!--<span> elements replaced with waypoint data -->
+        <p style="color: cornsilk; position: absolute; top: 15%; left: 41%; font-size: 25px;">Speed: <span id="com3"></span> </p><!--<span> elements replaced with waypoint data -->
+          <!-- Create HTML button elements-->
+        <button class="eStopBtn" type="button" id="stopButton">Emergency Shutdown!</button>
+        <button class='startBtn ' id='startButton' type='button'> Start </button>
+        <button class='pauseBtn ' id="pauseButton" type='button'>Pause</button>
+      </div>
+    </div>
+
+    <script>
+      //Set defualt values for user input text boxes
+      document.getElementById('command1').defaultValue = "0";
+      document.getElementById('command2').defaultValue = "0";
+      document.getElementById('command3').defaultValue = "0";
+
+      //Event Listener for button button presses. If a button click event, the event listener will call the funtion passed to it
+      var subButton = document.getElementById('subButton');
+      subButton.addEventListener('click', getData, false);
+      var startButton = document.getElementById('startButton');
+      startButton.addEventListener('click', start, false);
+      var pauseButton = document.getElementById('pauseButton');
+      pauseButton.addEventListener('click', pause, false);
+      var stopButton = document.getElementById('stopButton');
+      stopButton.addEventListener('click', stop, false);
+
+      updateStatus(false);//Connection status is fail by default 
+
+      //Call these functions at specified intervals in ms
+      window.setInterval(function () { getStatus(); }, 2000);
+      window.setInterval(function () { getTele(); }, 500);
+
+
+      //This funtion reads the user input boxes stores the data in JSON format and displays confirmed data back to the user
+      //It also sends waypoint commands entered by the user to the server.
+      function getData() {
+        var distance_y = document.getElementById('command1').value;
+        var distance_x = document.getElementById('command2').value;
+        var speed = document.getElementById('command3').value;
+        if (speed > 1 || speed < 0) {
+          speed = 1;
+          displayMessage("Please enter a value between 0 and 1 for speed<br>Waypoint sent with a speed of 1")
+        }
+        //Store Waypoint data as JSON
+        var sendData = {
+          "xDistance": distance_x,
+          "yDistance": distance_y,
+          "speed": speed
+        }
+        //Send POST request using Fetch API.
+        fetch('/tele', {
+          method: 'POST',
+          body: JSON.stringify(sendData), //Insert waypoint data as body of request
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(function (response) {
+            response.json().then(function (message) {//Parse response as JSON
+              displayMessage(message)//Display message in telemtry box
+            }).catch(doNothing);
+          })
+
+        // Display confirmed waypoint data Back to User
+        if (distance_y > -1) {
+          document.getElementById("com1").innerHTML = "Forwards " + distance_y + "m";
+        }
+        else {
+          document.getElementById("com1").innerHTML = "Backwards " + Math.abs(distance_y) + "m";
+        }
+        if (distance_x > -1) {
+          document.getElementById("com2").innerHTML = "Right " + distance_x + "m.";
+        }
+        else {
+          document.getElementById("com2").innerHTML = "Left " + Math.abs(distance_x) + "m.";
+        }
+        document.getElementById("com3").innerHTML = Math.abs(speed) + "m/s";
+      }
+
+      //Send POST request using Fetch API. Informs server if the start button was pressed 
+      function start() {
+        var startVar = { "start": 1 }
+        fetch('/start', {
+          method: 'POST',
+          body: JSON.stringify(startVar),  //Insert startVar variable as body of request
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(function (response) {
+            response.json().then(function (message) {//Parse server response as JSON
+              displayMessage(message)//Call displayMessage with recieved data
+            }).catch(doNothing);
+          })
+      }
+
+      //Send POST request using Fetch API. Informs server if the pause button was pressed 
+      function pause() {
+        var pauseVar = { "pause": 1 }
+        fetch('/pause', {
+          method: 'POST',
+          body: JSON.stringify(pauseVar),// Insert pauseVar variable as body of request
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(function (response) {
+            response.json().then(function (message) {//Parse server response as JSON
+              displayMessage(message)//Call displayMessage with recieved data
+            }).catch(doNothing);
+          })
+      }
+
+      //Send POST request using Fetch API. Informs server if the pause button was pressed 
+      function stop() {
+        var stopVar = { "stop": 1 }
+        fetch('/stop', {
+          method: 'POST',
+          body: JSON.stringify(stopVar),// Insert stopVar variable as body of request
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(function (response) {
+            response.json().then(function (message) { //Parse server response as JSON data
+              displayMessage(message)//Call displayMessage with recieved data
+            }).catch(doNothing);
+          })
+      }
+
+      // This function creates a GET request to recieve telemetry information from the server 
+      async function getTele() {
+        //Send get request using fetch api
+        const response = await fetch('/tele');  // Generate the Response object 
+        //Error if HTTP data not recieved
+        if (!response.ok) {
+          const message = `An error has occured: ${response.status}`;
+          throw new Error(message);
+        }
+
+        response.json()//Parse response as JSON data
+          .then(function (teleRecieved) {
+            teleRecieved.forEach(function (label) {
+              displayMessage(label); //Call displayMessage with recieved data
+            })
+          }).catch(doNothing);
+      }
+      //This function displays any messages passed to it to the telemetry display box
+      function displayMessage(message) {
+        var mainContainer = document.getElementById("teleDisplay");
+        var div = document.createElement("div");
+        div.innerHTML = message;
+        mainContainer.appendChild(div);
+      }
+      //This function creates a GET request to recieve connection status information from the server 
+      async function getStatus() {
+        const response = await fetch('/status');// Generate the response object 
+        //Error if HTTP data not recieved
+        if (!response.ok) {
+          const message = `An error has occured: ${response.status}`;
+          throw new Error(message);
+        }
+
+        response.json()  //Parse response as JSON data
+          .then(updateStatus)//Call updateStatus function a pass response to the function
+          .catch(doNothing);
+      }
+      //Ths function Updates the connection status display based on variable recieved 
+      function updateStatus(status) {
+        if (status) {
+          document.getElementById("conCheck").innerHTML = "<span style='color: #00FF00;' >OK</span>";
+        }
+        else {
+          document.getElementById("conCheck").innerHTML = "<span style='color: #FF0000;' >FAIL</span>";
+        }
+      }
+
+      function doNothing() { }; //Error hander 
+    </script>
+
+  </main>
+
+</body>
+
+</html>
