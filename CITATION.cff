@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+authors:
+- family-names: "Driessen"
+  given-names: "Harry"
+- family-names: "Judd"
+  given-names: "Aidan"
+- family-names: "Bromley"
+  given-names: "Leon"
+- family-names: "Anderson"
+  given-names: "Olive"
+title: "Small-Wireless-Office-Vehicle-Communication-System"
+version: 1.0.0
+date-released: 2022-06-02
+url: "https://github.com/Haziham/Small-Wireless-Office-Vehicle-Communication-System"
